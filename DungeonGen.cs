@@ -1,6 +1,6 @@
 using Godot;
 using System;
-
+[Tool]
 public partial class DungeonGen : Node3D
 {
 	[ExportGroup("BorderProperties")]
@@ -23,5 +23,10 @@ public partial class DungeonGen : Node3D
 
 	public override void _Process(double delta)
 	{
+	}
+
+	public DungeonGen()
+	{
+		GetViewport().DebugDraw = Viewport.DebugDrawEnum.Wireframe; 
 	}
 }
