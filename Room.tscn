@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://dvv1ub4ahmr34"]
+
+[ext_resource type="Script" uid="uid://8kow05wbqpff" path="res://Room.cs" id="1_gw2vq"]
+
+[node name="Node3D" type="Node3D" unique_id=34654451]
+script = ExtResource("1_gw2vq")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1224757661]
