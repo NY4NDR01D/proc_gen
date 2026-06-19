@@ -16,6 +16,8 @@ public partial class DungeonGen : Node3D
 	[Export]
 	private int max_num_rooms;
 
+	private GridMap gridMap;
+	private MeshLibrary Library;
 	
 	public override void _Ready()
 	{
