@@ -1,10 +1,11 @@
 [gd_scene format=3 uid="uid://bqk2cg0mjbanv"]
 
-[ext_resource type="MeshLibrary" uid="uid://dxjvvwiacingj" path="res://Rooms2.tres" id="1_qno4y"]
+[ext_resource type="Script" uid="uid://ch4fnde6re216" path="res://DungeonGen.cs" id="1_nc8bv"]
 
 [node name="DungeonGen" type="Node3D" unique_id=1331281188]
-
-[node name="GridMap" type="GridMap" parent="." unique_id=1030287211]
-mesh_library = ExtResource("1_qno4y")
-cell_size = Vector3(1, 1, 1)
-metadata/_editor_floor_ = Vector3(0, 1, 0)
+script = ExtResource("1_nc8bv")
+border_width = 30
+border_height = 5
+border_depth = 30
+min_num_rooms = 3
+max_num_rooms = 10

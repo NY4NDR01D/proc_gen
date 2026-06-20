@@ -9,8 +9,16 @@ public partial class Room : Node3D
 	private int width;
 
 	private int depth;
+	[Export] private MeshInstance3D roomMesh;
 
 	private Vector3I roomOrigin;
+
+	public Vector3I RoomOrigin
+	{
+		get => roomOrigin;
+		set => roomOrigin = value;
+	}
+
 	[Export]
 	private bool requiredRoom = false;
 	private int numDoors;
@@ -18,6 +26,12 @@ public partial class Room : Node3D
 	private int maxDuplicates = 1;
 
 	private RoomType roomType;
+
+	public int Height => height;
+
+	public int Width => width;
+
+	public int Depth => depth;
 
 	public RoomType getRoomType()
 	{
@@ -31,6 +45,20 @@ public partial class Room : Node3D
 	public int getMaxDuplicates()
 	{
 		return maxDuplicates;
+	}
+
+	public Room CopyRoom()
+	{
+		Room room = new Room();
+		return room;
+	}
+
+	public Room()
+	{
+		Vector3 size = roomMesh.GetAabb().Size;
+		width = (int)size.X;
+		height = (int)size.Z;
+		depth = (int)size.Y;
 	}
 	public override void _Ready()
 	{
