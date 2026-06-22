@@ -7,6 +7,7 @@ using ProcGen;
 [Tool]
 public partial class DungeonGen : Node3D
 {
+	[Export] private bool generate = false;
 	[ExportGroup("BorderProperties")]
 	[Export]
 	private int border_width; // x
@@ -20,7 +21,6 @@ public partial class DungeonGen : Node3D
 	[Export]
 	private int max_num_rooms;
 
-	[Export] private bool generate = false;
 	private bool generated = false;
 
 	private List<Room> roomLibrary;
@@ -28,8 +28,10 @@ public partial class DungeonGen : Node3D
 	private Dictionary<RoomType, int> roomCount;
 	private HashSet<Room> availableRooms;
 	private int[,,] occupancy;
-	private Node3D baseNode;
+	private Node baseNode;
 	private Random rng;
+	private Node3D library;
+	private Array roomTypes;
 
 	public void clearRooms()
 	{
@@ -47,6 +49,7 @@ public partial class DungeonGen : Node3D
 		int x = rng.Next(border_height - room.Height);
 		int z = rng.Next(border_width - room.Width);
 		int y = rng.Next(border_depth - room.Depth);
+		GD.Print("vector:", x, y, z);
 		return new Vector3I(x, y, z);
 	}
 
@@ -73,6 +76,9 @@ public partial class DungeonGen : Node3D
 			{
 				for (int k = 0; k < room.Depth; k++)
 				{
+					GD.Print("Occupying X: ", roomOrigin.X + i);
+					GD.Print("Occupying Y: ", roomOrigin.Y + i);
+					GD.Print("Occupying Z: ", roomOrigin.Z + i);
 					occupancy[roomOrigin.X + i, roomOrigin.Z + j, roomOrigin.Y + k] = 1;
 				}
 			}
@@ -82,13 +88,16 @@ public partial class DungeonGen : Node3D
 	{
 		if (!canBePlaced(roomOrigin, room)) return false;
 		
-		baseNode.AddChild(room);
 		room.RoomOrigin = roomOrigin;
 		roomCount[room.getRoomType()] += 1;
 		occupySpace(roomOrigin, room);
 		iterateAvailableRooms();
 		room.Name = roomOrigin.ToString();
+		room.placeRoom(roomOrigin);
+		// baseNode.AddChild(room);
+		baseNode.CallDeferred("add_child", room);
 		rooms.Add(room);
+		GD.Print(room.RoomMesh);
 		return true;
 	}
 
@@ -110,6 +119,7 @@ public partial class DungeonGen : Node3D
 	{
 		for (int i = 0; i < numRooms; i++)
 		{
+			GD.Print("Available rooms count: ", availableRooms.Count);
 			Room roomTemplate = availableRooms.ElementAt(rng.Next(availableRooms.Count));
 			Room room = roomTemplate.CopyRoom();
 			for (int j = 0; j < 100; j++)
@@ -123,14 +133,28 @@ public partial class DungeonGen : Node3D
 	public override void _Ready()
 	{
 		rng = new Random();
+		baseNode = GetTree().GetCurrentScene();
+		library = GD.Load<PackedScene>("res://Library.tscn").Instantiate<Node3D>();
+		roomLibrary = new List<Room>();
+		roomTypes = Enum.GetValues(typeof(RoomType));
+		foreach (MeshInstance3D mesh in library.GetChildren())
+		{
+			Room tempRoom = new Room(mesh, (RoomType)roomTypes.GetValue(rng.Next(roomTypes.Length)));
+			roomLibrary.Add(tempRoom);
+		}
+		GD.Print(roomLibrary.Count);
 		occupancy = new int[border_height, border_width, border_depth];
 		roomCount = new Dictionary<RoomType, int>();
+		foreach (RoomType roomType in roomTypes)
+		{
+			roomCount[roomType] = 0;
+		}
 		rooms = new List<Room>();
-		if(!generate) return;
+		// if(!generate) return;
 		foreach (Room room in roomLibrary)
 		{
 			RoomType roomType = room.getRoomType();
-			roomCount.Add(roomType, 0);
+			// roomCount.Add(roomType, 0);
 			if (room.isRequired())
 			{
 				// load of tries
@@ -144,50 +168,85 @@ public partial class DungeonGen : Node3D
 
 		int requiredRoomCount = rooms.Count;
 		int numRooms = rng.Next(min_num_rooms - requiredRoomCount, max_num_rooms - requiredRoomCount);
-		availableRooms = new HashSet<Room>(rooms);
+		availableRooms = new HashSet<Room>(roomLibrary);
+		iterateAvailableRooms();
 		placeRooms(numRooms);
 		generated = true;
 	}
 
 	public override void _Process(double delta)
 	{
+		return;
 		if (!generate)
 		{
 			if (generated)
 			{
 				clearRooms();
 			}
-
+		
 			return;
 		}
 
 		if (!generated)
 		{
-			foreach (Room room in roomLibrary)
+			if (generate)
 			{
-				RoomType roomType = room.getRoomType();
-				roomCount.Add(roomType, 0);
-				if (room.isRequired())
+				
+				foreach (MeshInstance3D mesh in library.GetChildren())
 				{
-					// load of tries
-					for (int i = 0; i < 100; i++)
+					Room tempRoom = new Room(mesh, (RoomType)roomTypes.GetValue(rng.Next(roomTypes.Length)));
+					roomLibrary.Add(tempRoom);
+				}
+				GD.Print("roomLibrary size: ", roomLibrary.Count);
+				foreach (Room room in roomLibrary)
+				{
+					RoomType roomType = room.getRoomType();
+					if (room.isRequired())
 					{
-						Vector3I roomPos = getRandomSpace(room);
-						if (placeRoom(roomPos, room)) break;
+						// load of tries
+						for (int i = 0; i < 100; i++)
+						{
+							Vector3I roomPos = getRandomSpace(room);
+							if (placeRoom(roomPos, room)) break;
+						}
 					}
 				}
+
+				int requiredRoomCount = rooms.Count;
+				GD.Print(requiredRoomCount);
+				GD.Print(min_num_rooms);
+				int numRooms = rng.Next(min_num_rooms - requiredRoomCount, max_num_rooms - requiredRoomCount);
+				GD.Print(numRooms);
+				availableRooms = new HashSet<Room>(roomLibrary);
+				iterateAvailableRooms();
+				GD.Print("AvailableRooms: ", availableRooms.Count);
+				placeRooms(numRooms);
+				GD.Print(baseNode.GetChildCount());
+				generated = true;
 			}
-
-			int requiredRoomCount = rooms.Count;
-			int numRooms = rng.Next(min_num_rooms - requiredRoomCount, max_num_rooms - requiredRoomCount);
-			availableRooms = new HashSet<Room>(rooms);
-			placeRooms(numRooms);
-			generated = true;
 		}
-	}
-
-	public DungeonGen()
-	{
-		GetViewport().DebugDraw = Viewport.DebugDrawEnum.Wireframe; 
+		// if (!generated)
+		// {
+		// 	foreach (Room room in roomLibrary)
+		// 	{
+		// 		RoomType roomType = room.getRoomType();
+		// 		roomCount.Add(roomType, 0);
+		// 		if (room.isRequired())
+		// 		{
+		// 			// load of tries
+		// 			for (int i = 0; i < 100; i++)
+		// 			{
+		// 				Vector3I roomPos = getRandomSpace(room);
+		// 				if (placeRoom(roomPos, room)) break;
+		// 			}
+		// 		}
+		// 	}
+		//
+		// 	int requiredRoomCount = rooms.Count;
+		// 	int numRooms = rng.Next(min_num_rooms - requiredRoomCount, max_num_rooms - requiredRoomCount);
+		// 	availableRooms = new HashSet<Room>(rooms);
+		// 	placeRooms(numRooms);
+		// 	generated = true;
+		// }
 	}
 }
