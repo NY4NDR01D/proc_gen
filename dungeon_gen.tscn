@@ -8,10 +8,10 @@
 [node name="DungeonGen" type="Node3D" unique_id=1331281188]
 script = ExtResource("1_nc8bv")
 border_width = 20
-border_height = 5
-border_depth = 20
-min_num_rooms = 20
-max_num_rooms = 50
+border_height = 20
+border_depth = 5
+min_num_rooms = 60
+max_num_rooms = 100
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1396808821]
 transform = Transform3D(1, 0, 0, 0, -0.026176963, 0.99965733, 0, -0.99965733, -0.026176963, -2, 14, -2)

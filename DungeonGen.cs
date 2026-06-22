@@ -61,7 +61,11 @@ public partial class DungeonGen : Node3D
 			{
 				for (int k = 0; k < room.Depth; k++)
 				{
-					if (occupancy[roomOrigin.X + i, roomOrigin.Z + j, roomOrigin.Y + k] != 0) return false;
+					if (occupancy[roomOrigin.X + i, roomOrigin.Z + j, roomOrigin.Y + k] != 0)
+					{
+						GD.Print("Space occupied");
+						return false;
+					}
 				}
 			}
 		}
@@ -79,7 +83,9 @@ public partial class DungeonGen : Node3D
 					GD.Print("Occupying X: ", roomOrigin.X + i);
 					GD.Print("Occupying Y: ", roomOrigin.Y + i);
 					GD.Print("Occupying Z: ", roomOrigin.Z + i);
+					// occupancy[Math.Max(0, roomOrigin.X + i - 1), Math.Max(0, roomOrigin.Z + j - 1) , Math.Max(0, roomOrigin.Y + k - 1)] = 1;
 					occupancy[roomOrigin.X + i, roomOrigin.Z + j, roomOrigin.Y + k] = 1;
+					// occupancy[Math.Min(roomOrigin.X + i + 1, border_height - 1), Math.Min(roomOrigin.Z + j + 1, border_width - 1), Math.Min(roomOrigin.Y + k + 1, border_depth - 1)] = 1;
 				}
 			}
 		}
