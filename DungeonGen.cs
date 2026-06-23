@@ -49,7 +49,6 @@ public partial class DungeonGen : Node3D
 		int x = rng.Next(border_height - room.Height);
 		int z = rng.Next(border_width - room.Width);
 		int y = rng.Next(border_depth - room.Depth);
-		GD.Print("vector:", x, y, z);
 		return new Vector3I(x, y, z);
 	}
 
@@ -80,9 +79,6 @@ public partial class DungeonGen : Node3D
 			{
 				for (int k = 0; k < room.Depth; k++)
 				{
-					GD.Print("Occupying X: ", roomOrigin.X + i);
-					GD.Print("Occupying Y: ", roomOrigin.Y + i);
-					GD.Print("Occupying Z: ", roomOrigin.Z + i);
 					// occupancy[Math.Max(0, roomOrigin.X + i - 1), Math.Max(0, roomOrigin.Z + j - 1) , Math.Max(0, roomOrigin.Y + k - 1)] = 1;
 					occupancy[roomOrigin.X + i, roomOrigin.Z + j, roomOrigin.Y + k] = 1;
 					// occupancy[Math.Min(roomOrigin.X + i + 1, border_height - 1), Math.Min(roomOrigin.Z + j + 1, border_width - 1), Math.Min(roomOrigin.Y + k + 1, border_depth - 1)] = 1;
@@ -103,7 +99,6 @@ public partial class DungeonGen : Node3D
 		// baseNode.AddChild(room);
 		baseNode.CallDeferred("add_child", room);
 		rooms.Add(room);
-		GD.Print(room.RoomMesh);
 		return true;
 	}
 
@@ -125,7 +120,6 @@ public partial class DungeonGen : Node3D
 	{
 		for (int i = 0; i < numRooms; i++)
 		{
-			GD.Print("Available rooms count: ", availableRooms.Count);
 			Room roomTemplate = availableRooms.ElementAt(rng.Next(availableRooms.Count));
 			Room room = roomTemplate.CopyRoom();
 			for (int j = 0; j < 100; j++)
@@ -148,7 +142,6 @@ public partial class DungeonGen : Node3D
 			Room tempRoom = new Room(mesh, (RoomType)roomTypes.GetValue(rng.Next(roomTypes.Length)));
 			roomLibrary.Add(tempRoom);
 		}
-		GD.Print(roomLibrary.Count);
 		occupancy = new int[border_height, border_width, border_depth];
 		roomCount = new Dictionary<RoomType, int>();
 		foreach (RoomType roomType in roomTypes)
@@ -203,7 +196,6 @@ public partial class DungeonGen : Node3D
 					Room tempRoom = new Room(mesh, (RoomType)roomTypes.GetValue(rng.Next(roomTypes.Length)));
 					roomLibrary.Add(tempRoom);
 				}
-				GD.Print("roomLibrary size: ", roomLibrary.Count);
 				foreach (Room room in roomLibrary)
 				{
 					RoomType roomType = room.getRoomType();
@@ -219,15 +211,10 @@ public partial class DungeonGen : Node3D
 				}
 
 				int requiredRoomCount = rooms.Count;
-				GD.Print(requiredRoomCount);
-				GD.Print(min_num_rooms);
 				int numRooms = rng.Next(min_num_rooms - requiredRoomCount, max_num_rooms - requiredRoomCount);
-				GD.Print(numRooms);
 				availableRooms = new HashSet<Room>(roomLibrary);
 				iterateAvailableRooms();
-				GD.Print("AvailableRooms: ", availableRooms.Count);
 				placeRooms(numRooms);
-				GD.Print(baseNode.GetChildCount());
 				generated = true;
 			}
 		}
