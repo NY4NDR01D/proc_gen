@@ -55,7 +55,8 @@ public partial class Room : Node3D
 
 	public void placeRoom(Vector3 pos)
 	{
-		this.SetPosition(pos);	
+		Vector3 midPos = new Vector3(pos.X + width/2, pos.Y + depth/2, pos.Z + height/2);
+		this.SetPosition(midPos);	
 	}
 
 	public MeshInstance3D RoomMesh => roomMesh;

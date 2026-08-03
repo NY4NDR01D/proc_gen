@@ -46,21 +46,21 @@ public partial class DungeonGen : Node3D
 
 	public Vector3I getRandomSpace(Room room)
 	{
-		int x = rng.Next(border_height - room.Height);
-		int z = rng.Next(border_width - room.Width);
-		int y = rng.Next(border_depth - room.Depth);
-		return new Vector3I(x, y, z);
+		int x = rng.Next(room.Height/2,border_height - room.Height/2);
+		int z = rng.Next(room.Width/2,border_width - room.Width/2);
+		int y = rng.Next(room.Depth / 2,border_depth - room.Depth/2);
+		return new Vector3I(z, y, x);
 	}
 
 	public bool canBePlaced(Vector3I roomOrigin, Room room)
 	{
-		for (int i = 0; i < room.Height; i++)
+		for (int i = -room.Height/2; i < room.Height/2; i++)
 		{
-			for (int j = 0; j < room.Width; j++)
+			for (int j = -room.Width/2; j < room.Width/2; j++)
 			{
-				for (int k = 0; k < room.Depth; k++)
+				for (int k = -room.Depth/2; k < room.Depth/2; k++)
 				{
-					if (occupancy[roomOrigin.X + i, roomOrigin.Z + j, roomOrigin.Y + k] != 0)
+					if (occupancy[roomOrigin.Z + i, roomOrigin.X + j, roomOrigin.Y + k] != 0)
 					{
 						GD.Print("Space occupied");
 						return false;
@@ -73,15 +73,15 @@ public partial class DungeonGen : Node3D
 
 	public void occupySpace(Vector3I roomOrigin, Room room)
 	{
-		for (int i = 0; i < room.Height; i++)
+		for (int i = -room.Height/2; i < room.Height/2; i++)
 		{
-			for (int j = 0; j < room.Width; j++)
+			for (int j = -room.Width/2; j < room.Width/2; j++)
 			{
-				for (int k = 0; k < room.Depth; k++)
+				for (int k = -room.Depth/2; k < room.Depth/2; k++)
 				{
-					// occupancy[Math.Max(0, roomOrigin.X + i - 1), Math.Max(0, roomOrigin.Z + j - 1) , Math.Max(0, roomOrigin.Y + k - 1)] = 1;
-					occupancy[roomOrigin.X + i, roomOrigin.Z + j, roomOrigin.Y + k] = 1;
-					// occupancy[Math.Min(roomOrigin.X + i + 1, border_height - 1), Math.Min(roomOrigin.Z + j + 1, border_width - 1), Math.Min(roomOrigin.Y + k + 1, border_depth - 1)] = 1;
+					//occupancy[Math.Max(0, roomOrigin.X + i - 1), Math.Max(0, roomOrigin.Z + j - 1) , Math.Max(0, roomOrigin.Y + k - 1)] = 1;
+					occupancy[roomOrigin.Z + i, roomOrigin.X + j, roomOrigin.Y + k] = 1;
+					//occupancy[Math.Min(roomOrigin.X + i + 1, border_height - 1), Math.Min(roomOrigin.Z + j + 1, border_width - 1), Math.Min(roomOrigin.Y + k + 1, border_depth - 1)] = 1;
 				}
 			}
 		}
