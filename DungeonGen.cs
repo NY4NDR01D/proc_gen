@@ -54,34 +54,39 @@ public partial class DungeonGen : Node3D
 
 	public bool canBePlaced(Vector3I roomOrigin, Room room)
 	{
-		for (int i = -room.Height/2; i < room.Height/2; i++)
+		int count = 0;
+		for (int i = (int)Math.Ceiling(-room.Height/2f); i < room.Height/2f; i++)
 		{
-			for (int j = -room.Width/2; j < room.Width/2; j++)
+			for (int j = (int)Math.Ceiling(-room.Width/2f); j < room.Width/2f; j++)
 			{
-				for (int k = -room.Depth/2; k < room.Depth/2; k++)
+				for (int k = (int)Math.Ceiling(-room.Depth/2f); k < room.Depth/2f; k++)
 				{
+					count++;
+					// GD.Print($"X: {roomOrigin.X + j} Y: {roomOrigin.Y + k} Z: {roomOrigin.Z + i}");
 					if (occupancy[roomOrigin.Z + i, roomOrigin.X + j, roomOrigin.Y + k] != 0)
 					{
+						// GD.Print($"X: {roomOrigin.X + j} Y: {roomOrigin.Y + k} Z: {roomOrigin.Z + i}");
 						GD.Print("Space occupied");
 						return false;
 					}
 				}
 			}
 		}
+		GD.Print($"Count: {count}");
 		return true;
 	}
 
 	public void occupySpace(Vector3I roomOrigin, Room room)
 	{
-		for (int i = -room.Height/2; i < room.Height/2; i++)
+		for (int i = (int)Math.Ceiling(-room.Height/2f); i < room.Height/2f; i++)
 		{
-			for (int j = -room.Width/2; j < room.Width/2; j++)
+			for (int j = (int)Math.Ceiling(-room.Width/2f); j < room.Width/2f; j++)
 			{
-				for (int k = -room.Depth/2; k < room.Depth/2; k++)
+				for (int k = (int)Math.Ceiling(-room.Depth/2f); k < room.Depth/2f; k++)
 				{
-					//occupancy[Math.Max(0, roomOrigin.X + i - 1), Math.Max(0, roomOrigin.Z + j - 1) , Math.Max(0, roomOrigin.Y + k - 1)] = 1;
+					occupancy[Math.Max(0, roomOrigin.X + i - 1), Math.Max(0, roomOrigin.Z + j - 1) , Math.Max(0, roomOrigin.Y + k - 1)] = 1;
 					occupancy[roomOrigin.Z + i, roomOrigin.X + j, roomOrigin.Y + k] = 1;
-					//occupancy[Math.Min(roomOrigin.X + i + 1, border_height - 1), Math.Min(roomOrigin.Z + j + 1, border_width - 1), Math.Min(roomOrigin.Y + k + 1, border_depth - 1)] = 1;
+					occupancy[Math.Min(roomOrigin.X + i + 1, border_height - 1), Math.Min(roomOrigin.Z + j + 1, border_width - 1), Math.Min(roomOrigin.Y + k + 1, border_depth - 1)] = 1;
 				}
 			}
 		}

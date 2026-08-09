@@ -55,8 +55,8 @@ public partial class Room : Node3D
 
 	public void placeRoom(Vector3 pos)
 	{
-		Vector3 midPos = new Vector3(pos.X + width/2, pos.Y + depth/2, pos.Z + height/2);
-		this.SetPosition(midPos);	
+		Vector3 midPos = new Vector3(pos.X + width/2f, pos.Y + depth/2f, pos.Z + height/2f);
+		this.SetPosition(midPos);
 	}
 
 	public MeshInstance3D RoomMesh => roomMesh;
@@ -65,7 +65,7 @@ public partial class Room : Node3D
 	{
 		roomMesh = new MeshInstance3D();
 		roomType = RoomType.BasicRoom;
-		Vector3 size = roomMesh.GetAabb().Size;
+		Vector3 size = roomMesh.GetAabb().Size * roomMesh.Scale;
 		width = (int)size.X;
 		height = (int)size.Z;
 		depth = (int)size.Y;
@@ -74,7 +74,8 @@ public partial class Room : Node3D
 	{
 		roomMesh = (MeshInstance3D)mesh.Duplicate();
 		roomType = roomStyle;
-		Vector3 size = roomMesh.GetAabb().Size;
+		Vector3 size = roomMesh.GetAabb().Size * roomMesh.Scale;
+		roomMesh.Position = Vector3.Zero;
 		width = (int)size.X;
 		height = (int)size.Z;
 		depth = (int)size.Y;
