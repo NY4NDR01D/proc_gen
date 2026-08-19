@@ -46,20 +46,20 @@ public partial class DungeonGen : Node3D
 
 	public Vector3I getRandomSpace(Room room)
 	{
-		int x = rng.Next(room.Height/2,border_height - room.Height/2);
-		int z = rng.Next(room.Width/2,border_width - room.Width/2);
-		int y = rng.Next(room.Depth / 2,border_depth - room.Depth/2);
+		int x = rng.Next(0,border_height - (room.Height + 1));
+		int z = rng.Next(0,border_width - (room.Width + 1));
+		int y = rng.Next(0,border_depth - (room.Depth + 1));
 		return new Vector3I(z, y, x);
 	}
 
 	public bool canBePlaced(Vector3I roomOrigin, Room room)
 	{
 		int count = 0;
-		for (int i = (int)Math.Ceiling(-room.Height/2f); i < room.Height/2f; i++)
+		for (int i = 0; i < room.Height; i++)
 		{
-			for (int j = (int)Math.Ceiling(-room.Width/2f); j < room.Width/2f; j++)
+			for (int j = 0; j < room.Width; j++)
 			{
-				for (int k = (int)Math.Ceiling(-room.Depth/2f); k < room.Depth/2f; k++)
+				for (int k = 0; k < room.Depth; k++)
 				{
 					count++;
 					// GD.Print($"X: {roomOrigin.X + j} Y: {roomOrigin.Y + k} Z: {roomOrigin.Z + i}");
@@ -78,11 +78,11 @@ public partial class DungeonGen : Node3D
 
 	public void occupySpace(Vector3I roomOrigin, Room room)
 	{
-		for (int i = (int)Math.Ceiling(-room.Height/2f); i < room.Height/2f; i++)
+		for (int i = 0; i < room.Height; i++)
 		{
-			for (int j = (int)Math.Ceiling(-room.Width/2f); j < room.Width/2f; j++)
+			for (int j = 0; j < room.Width; j++)
 			{
-				for (int k = (int)Math.Ceiling(-room.Depth/2f); k < room.Depth/2f; k++)
+				for (int k = 0; k < room.Depth; k++)
 				{
 					occupancy[Math.Max(0, roomOrigin.X + i - 1), Math.Max(0, roomOrigin.Z + j - 1) , Math.Max(0, roomOrigin.Y + k - 1)] = 1;
 					occupancy[roomOrigin.Z + i, roomOrigin.X + j, roomOrigin.Y + k] = 1;

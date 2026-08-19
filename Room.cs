@@ -66,9 +66,9 @@ public partial class Room : Node3D
 		roomMesh = new MeshInstance3D();
 		roomType = RoomType.BasicRoom;
 		Vector3 size = roomMesh.GetAabb().Size * roomMesh.Scale;
-		width = (int)size.X;
-		height = (int)size.Z;
-		depth = (int)size.Y;
+		width = (int)Math.Ceiling(size.X);
+		height = (int)Math.Ceiling(size.Z);
+		depth = (int)Math.Ceiling(size.Y);
 	}
 	public Room(MeshInstance3D mesh, RoomType roomStyle)
 	{
@@ -76,9 +76,9 @@ public partial class Room : Node3D
 		roomType = roomStyle;
 		Vector3 size = roomMesh.GetAabb().Size * roomMesh.Scale;
 		roomMesh.Position = Vector3.Zero;
-		width = (int)size.X;
-		height = (int)size.Z;
-		depth = (int)size.Y;
+		width = (int)Math.Ceiling(size.X);
+		height = (int)Math.Ceiling(size.Z);
+		depth = (int)Math.Ceiling(size.Y);
 	}
 	public override void _Ready()
 	{
