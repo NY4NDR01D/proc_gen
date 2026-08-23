@@ -7,31 +7,31 @@ using ProcGen;
 [Tool]
 public partial class DungeonGen : Node3D
 {
-	[Export] private bool generate = false;
+	[Export] protected bool generate = false;
 	[ExportGroup("BorderProperties")]
 	[Export]
-	private int border_width; // x
+	protected int border_width; // x
 	[Export]
-	private int border_height; // z
+	protected int border_height; // z
 	[Export]
-	private int border_depth; // y
+	protected int border_depth; // y
 	[ExportGroup("RoomProperties")]
 	[Export]
-	private int min_num_rooms;
+	protected int min_num_rooms;
 	[Export]
-	private int max_num_rooms;
+	protected int max_num_rooms;
 
-	private bool generated = false;
+	protected bool generated = false;
 
-	private List<Room> roomLibrary;
-	private List<Room> rooms;
-	private Dictionary<RoomType, int> roomCount;
-	private HashSet<Room> availableRooms;
-	private int[,,] occupancy;
-	private Node baseNode;
-	private Random rng;
-	private Node3D library;
-	private Array roomTypes;
+	protected List<Room> roomLibrary;
+	protected List<Room> rooms;
+	protected Dictionary<RoomType, int> roomCount;
+	protected HashSet<Room> availableRooms;
+	protected int[,,] occupancy;
+	protected Node baseNode;
+	protected Random rng;
+	protected Node3D library;
+	protected Array roomTypes;
 
 	public void clearRooms()
 	{
@@ -158,121 +158,12 @@ public partial class DungeonGen : Node3D
 	}
 	public override void _Ready()
 	{
-		rng = new Random();
 		baseNode = GetTree().GetCurrentScene();
-		library = GD.Load<PackedScene>("res://Library.tscn").Instantiate<Node3D>();
-		roomLibrary = new List<Room>();
-		roomTypes = Enum.GetValues(typeof(RoomType));
-		foreach (MeshInstance3D mesh in library.GetChildren())
-		{
-			Room tempRoom = new Room(mesh, (RoomType)roomTypes.GetValue(rng.Next(roomTypes.Length)));
-			roomLibrary.Add(tempRoom);
-		}
-		occupancy = new int[border_height, border_width, border_depth];
-		roomCount = new Dictionary<RoomType, int>();
-		foreach (RoomType roomType in roomTypes)
-		{
-			roomCount[roomType] = 0;
-		}
-		rooms = new List<Room>();
-		// if(!generate) return;
-		foreach (Room room in roomLibrary)
-		{
-			RoomType roomType = room.getRoomType();
-			// roomCount.Add(roomType, 0);
-			if (room.isRequired())
-			{
-				// load of tries
-				for (int i = 0; i < 100; i++)
-				{
-					Vector3I roomPos = getRandomSpace(room);
-					if (placeRoom(roomPos, room)) break;
-				}
-			}
-		}
-
-		int requiredRoomCount = rooms.Count;
-		int numRooms = rng.Next(min_num_rooms - requiredRoomCount, max_num_rooms - requiredRoomCount);
-		availableRooms = new HashSet<Room>(roomLibrary);
-		iterateAvailableRooms();
-		placeRooms(numRooms);
-		List<Kruskal.Edge> edges = Kruskal.MST(rooms, rooms[0]);
-		List<MeshInstance3D> lines = new List<MeshInstance3D>();
-		foreach (Kruskal.Edge edge in edges)
-		{
-			MeshInstance3D line = Line(edge.startRoom.RoomOrigin, edge.endRoom.RoomOrigin);
-			lines.Add(line);
-		}
-		generated = true;
+		ConnectionGen generator = new ConnectionGen(min_num_rooms, max_num_rooms, border_width, border_depth, border_height);
+		baseNode.CallDeferred("add_child", generator);
 	}
 
 	public override void _Process(double delta)
 	{
-		return;
-		if (!generate)
-		{
-			if (generated)
-			{
-				clearRooms();
-			}
-		
-			return;
-		}
-
-		if (!generated)
-		{
-			if (generate)
-			{
-				
-				foreach (MeshInstance3D mesh in library.GetChildren())
-				{
-					Room tempRoom = new Room(mesh, (RoomType)roomTypes.GetValue(rng.Next(roomTypes.Length)));
-					roomLibrary.Add(tempRoom);
-				}
-				foreach (Room room in roomLibrary)
-				{
-					RoomType roomType = room.getRoomType();
-					if (room.isRequired())
-					{
-						// load of tries
-						for (int i = 0; i < 100; i++)
-						{
-							Vector3I roomPos = getRandomSpace(room);
-							if (placeRoom(roomPos, room)) break;
-						}
-					}
-				}
-
-				int requiredRoomCount = rooms.Count;
-				int numRooms = rng.Next(min_num_rooms - requiredRoomCount, max_num_rooms - requiredRoomCount);
-				availableRooms = new HashSet<Room>(roomLibrary);
-				iterateAvailableRooms();
-				placeRooms(numRooms);
-				generated = true;
-			}
-		}
-		// if (!generated)
-		// {
-		// 	foreach (Room room in roomLibrary)
-		// 	{
-		// 		RoomType roomType = room.getRoomType();
-		// 		roomCount.Add(roomType, 0);
-		// 		if (room.isRequired())
-		// 		{
-		// 			// load of tries
-		// 			for (int i = 0; i < 100; i++)
-		// 			{
-		// 				Vector3I roomPos = getRandomSpace(room);
-		// 				if (placeRoom(roomPos, room)) break;
-		// 			}
-		// 		}
-		// 	}
-		//
-		// 	int requiredRoomCount = rooms.Count;
-		// 	int numRooms = rng.Next(min_num_rooms - requiredRoomCount, max_num_rooms - requiredRoomCount);
-		// 	availableRooms = new HashSet<Room>(rooms);
-		// 	placeRooms(numRooms);
-		// 	generated = true;
-		// }
 	}
 }
