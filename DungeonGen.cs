@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProcGen;
-
+	
 [Tool]
 public partial class DungeonGen : Node3D
 {
@@ -135,6 +135,27 @@ public partial class DungeonGen : Node3D
 		}
 
 	}
+	public MeshInstance3D Line(Vector3 pos1, Vector3 pos2, Color? color = null)
+	{
+		var meshInstance = new MeshInstance3D();
+		var immediateMesh = new ImmediateMesh();
+		var material = new StandardMaterial3D();
+
+		meshInstance.Mesh = immediateMesh;
+		meshInstance.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off;
+
+		immediateMesh.SurfaceBegin(Mesh.PrimitiveType.Lines, material);
+		immediateMesh.SurfaceAddVertex(pos1);
+		immediateMesh.SurfaceAddVertex(pos2);
+		immediateMesh.SurfaceEnd();
+
+		material.ShadingMode = StandardMaterial3D.ShadingModeEnum.Unshaded;
+		material.AlbedoColor = color ?? Colors.WhiteSmoke;
+
+		baseNode.CallDeferred("add_child", meshInstance);
+
+		return meshInstance;
+	}
 	public override void _Ready()
 	{
 		rng = new Random();
@@ -175,6 +196,13 @@ public partial class DungeonGen : Node3D
 		availableRooms = new HashSet<Room>(roomLibrary);
 		iterateAvailableRooms();
 		placeRooms(numRooms);
+		List<Kruskal.Edge> edges = Kruskal.MST(rooms, rooms[0]);
+		List<MeshInstance3D> lines = new List<MeshInstance3D>();
+		foreach (Kruskal.Edge edge in edges)
+		{
+			MeshInstance3D line = Line(edge.startRoom.RoomOrigin, edge.endRoom.RoomOrigin);
+			lines.Add(line);
+		}
 		generated = true;
 	}
 
