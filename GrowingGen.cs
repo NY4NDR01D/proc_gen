@@ -1,6 +1,6 @@
 namespace ProcGen;
 
-public class GrowingGen
+public partial class GrowingGen : DungeonGen
 {
     
 }

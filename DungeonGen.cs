@@ -111,10 +111,10 @@ public partial class DungeonGen : Node3D
 
 	public bool placeCorridor(Vector3I roomOrigin, Room room)
 	{
-		if (!canBePlaced(roomOrigin, room)) return false;
+		// if (!canBePlaced(roomOrigin, room)) return false;
 		
 		room.RoomOrigin = roomOrigin;
-		occupySpace(roomOrigin, room);
+		// occupySpace(roomOrigin, room);
 		room.Name = roomOrigin.ToString();
 		room.placeRoom(roomOrigin);
 		// baseNode.AddChild(room);

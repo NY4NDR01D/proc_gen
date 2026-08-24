@@ -1,7 +1,6 @@
+namespace ProcGen;
 using System;
 using System.Linq;
-
-namespace ProcGen;
 using Godot;
 using System;
 using System.Collections.Generic;
