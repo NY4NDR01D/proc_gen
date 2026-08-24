@@ -8,5 +8,6 @@ public enum RoomType
     SchoolRoom,
     PracticeRoom,
     FunRoom,
-    GamerRoom
+    GamerRoom,
+    Corridor
 }

@@ -25,6 +25,8 @@ public partial class DungeonGen : Node3D
 
 	protected List<Room> roomLibrary;
 	protected List<Room> rooms;
+	protected List<Room> corridorLibrary;
+	protected List<Room> corridors;
 	protected Dictionary<RoomType, int> roomCount;
 	protected HashSet<Room> availableRooms;
 	protected int[,,] occupancy;
@@ -107,6 +109,19 @@ public partial class DungeonGen : Node3D
 		return true;
 	}
 
+	public bool placeCorridor(Vector3I roomOrigin, Room room)
+	{
+		if (!canBePlaced(roomOrigin, room)) return false;
+		
+		room.RoomOrigin = roomOrigin;
+		occupySpace(roomOrigin, room);
+		room.Name = roomOrigin.ToString();
+		room.placeRoom(roomOrigin);
+		// baseNode.AddChild(room);
+		baseNode.CallDeferred("add_child", room);
+		rooms.Add(room);
+		return true;
+	}
 	public void iterateAvailableRooms()
 	{
 		HashSet<Room> roomsLeft = new HashSet<Room>();

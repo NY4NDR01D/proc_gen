@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace ProcGen;
 using Godot;
@@ -16,12 +17,19 @@ public partial class ConnectionGen : DungeonGen
         max_num_rooms = maxNumRooms;
         rng = new Random();
         library = GD.Load<PackedScene>("res://Library.tscn").Instantiate<Node3D>();
+        Node3D corridorNode = GD.Load<PackedScene>("res://Corridors.tscn").Instantiate<Node3D>();
         roomLibrary = new List<Room>();
         roomTypes = Enum.GetValues(typeof(RoomType));
+        corridorLibrary = new List<Room>();
         foreach (MeshInstance3D mesh in library.GetChildren())
         {
-            Room tempRoom = new Room(mesh, (RoomType)roomTypes.GetValue(rng.Next(roomTypes.Length)));
+            Room tempRoom = new Room(mesh, (RoomType)roomTypes.GetValue(rng.Next(roomTypes.Length-1)));
             roomLibrary.Add(tempRoom);
+        }
+        foreach (MeshInstance3D mesh in corridorNode.GetChildren())
+        {
+            Room tempRoom = new Room(mesh, RoomType.Corridor);
+            corridorLibrary.Add(tempRoom);
         }
         occupancy = new int[border_height, border_width, border_depth];
         roomCount = new Dictionary<RoomType, int>();
@@ -55,12 +63,19 @@ public partial class ConnectionGen : DungeonGen
         availableRooms = new HashSet<Room>(roomLibrary);
         iterateAvailableRooms();
         placeRooms(numRooms);
-        List<Kruskal.Edge> edges = Kruskal.MST(rooms, rooms[0]);
+        List<Pathing.Edge> edges = Pathing.MST(rooms, rooms[0]);
         List<MeshInstance3D> lines = new List<MeshInstance3D>();
-        foreach (Kruskal.Edge edge in edges)
+        List<Vector3I> corridors = new List<Vector3I>();
+        foreach (Pathing.Edge edge in edges)
         {
             MeshInstance3D line = Line(edge.startRoom.RoomOrigin, edge.endRoom.RoomOrigin);
             lines.Add(line);
+            Pathing.AStar(edge.startRoom, edge.endRoom).ForEach(p => corridors.Add(p));
+        }
+
+        foreach (Vector3I corridor in corridors)
+        {
+            placeCorridor(corridor, corridorLibrary[0].CopyRoom());
         }
         generated = true;
     }
